@@ -125,10 +125,10 @@ const handleEvent = async (event: WebhookEvent) => {
             mongoDBClient.db('ratebotDB').collection('config').findOne({ userId: event.source.userId }).then(async (res: any) => {
                 if (res) {
                     const data = await exchangeRate.find((item: any) => { return item.cUnit == res.config.currency; });
-                    let rate = parseFloat(data.rate[0].cSelling);
+                    let rate = parseFloat(data.rate[0].cBuying);
                     let result = parseFloat(message.replace(/,/g, '')) * rate;
                     if(res.config.reverse) {
-                        rate = parseFloat(data.rate[0].cBuying);
+                        rate = parseFloat(data.rate[0].cSelling);
                         result = parseFloat(message.replace(/,/g, '')) / rate;
                     }
                     client.replyMessage(event.replyToken, {
