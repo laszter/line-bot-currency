@@ -33,7 +33,7 @@ const handleEvent = async (event: WebhookEvent) => {
 
     const message = event.message.text;
     if (message.toLocaleLowerCase().startsWith('currency')) {
-        const currency = message.replace('currency', '').trim();
+        const currency = message.toLocaleLowerCase().replace('currency', '').trim();
 
         mongoDBClient.db('ratebotDB').collection('config').findOne({ userId: event.source.userId }).then((res: any) => {
             if (res) {
@@ -52,7 +52,7 @@ const handleEvent = async (event: WebhookEvent) => {
         });
     }
     else if (message.toLocaleLowerCase().startsWith('vat')) {
-        const vat = message.replace('vat', '').trim();
+        const vat = message.toLocaleLowerCase().replace('vat', '').trim();
 
         mongoDBClient.db('ratebotDB').collection('config').findOne({ userId: event.source.userId }).then((res: any) => {
             if (res) {
@@ -125,9 +125,10 @@ const handleEvent = async (event: WebhookEvent) => {
             mongoDBClient.db('ratebotDB').collection('config').findOne({ userId: event.source.userId }).then(async (res: any) => {
                 if (res) {
                     const data = await exchangeRate.find((item: any) => { return item.cUnit == res.config.currency; });
-                    const rate = parseFloat(data.rate[0].cSelling);
+                    let rate = parseFloat(data.rate[0].cSelling);
                     let result = parseFloat(message.replace(/,/g, '')) * rate;
                     if(res.config.reverse) {
+                        rate = parseFloat(data.rate[0].cBuying);
                         result = parseFloat(message.replace(/,/g, '')) / rate;
                     }
                     client.replyMessage(event.replyToken, {
